@@ -38,6 +38,22 @@ Step 1: Install docker through apt
     # solution: adding the company proxy to docker following the guide https://docs.docker.com/network/proxy/
     # docker is now usable and working as expected
 
+Step 2: Learning about the features of docker
+
+    docker run <image-name> is a combination of docker pull <image-name> (if it doesn't exist locally) and docker start <image-name>
+    docker run <image-name without any additional parameters start a new container in the current terminal blocking it
+        stopping it through CTRL+C does not delete the container itself, rerunning the command results in another container creation
+        reusing the container is possible through using its container id OR by passing the parameter --name=<container-name> and afterwards running through docker start <container-name> or docker start <container-id>
+        using the parameter -d for detach results in not blocking the terminal and keeping the container running in the back
+    docker ps lists all currently running containers
+        using the parameter -a also lists terminated but existing containers, this can be used to find container id or container name
+    docker stop <container-id> or docker stop <container-name> results in terminating the container
+
+    docker run -p 6001:6379 <image-name> can be used to forward the port 6001 of the host system to the port 6379 of the docker container
+        while multiple docker containers can use the same port, the host cannot, therefore running multiple containers of a image is possible as long as the host provides different ports
+
+    docker exec -it <image-name> /bin/bash can be used to connect to the bash of a container
+
 #### To start the application
 
 Step 1: Create docker network

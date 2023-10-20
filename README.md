@@ -54,6 +54,43 @@ Step 2: Learning about the features of docker
 
     docker exec -it <image-name> /bin/bash can be used to connect to the bash of a container
 
+#### Starting with the demo project
+
+    docker pull mongo
+        pulls the mongo database image from docker hub
+    docker pull mongo-express
+        pulls the mongo-express graphical web ui for a mongo database from docker hub
+
+    docker network ls
+        lists all the existing networks, there are a few by default which will be explained later
+    docker network create <network-name>
+        will create another bridge network
+
+    docker run -p 27017:27017 -d -e MONGO_INITDB_ROOT_USERNAME=admin -e MONGO_INITDB_ROOT_PASSWORD=password --name mongodb --net mongo-network mongo
+        basic command to run the mongo db, pass some environment variables (the user information), ports, network and name
+    docker run -d \
+    -p 27017:27017 \
+    -e MONGO_INITDB_ROOT_USERNAME=admin \
+    -e MONGO_INITDB_ROOT_PASSWORD=password \
+    --name mongodb \
+    --net mongo-network \
+    mongo
+        same command but with intendention to make it more readable 
+
+    docker logs <container-id> to see the logs of a container
+
+    docker run -d \
+    -p 8081:8081 \
+    -e ME_CONFIG_MONGODB_ADMINUSERNAME=admin \
+    -e ME_CONFIG_MONGODB_ADMINPASSWORD=password \
+    --name mongo-express \
+    --net mongo-network \
+    -e ME_CONFIG_MONGODB_SERVER=mongodb \
+    mongo-express
+        connection works and through localhost:8081 mongo-express is accessable, but the basic auth information is required to access (see docker logs of the container)
+
+    manually create a database "user-account" over the UI (this could also be done through a ENV variable (-e ME_CONFIG_MONGODB_AUTH_DATABASE=user-account)
+
 #### To start the application
 
 Step 1: Create docker network

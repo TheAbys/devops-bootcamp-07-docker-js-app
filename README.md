@@ -148,6 +148,23 @@ Step 6: shutdown the application
 
 #### To build a docker image from the application
 
-    docker build -t my-app:1.0 .       
+    docker build -t my-app:1.0 .
+        creating a new image based on the Dockerfile called my-app in version 1.0
+        for it to work properly the node app must be installed within the Dockerfile
+
+    # Dockerfile was changed therefore the image must be rebuilt, we have to remove the image and the container before we can rebuild the image
+    docker ps -a | grep my-app
+        find the docker container for my-app
+    docker images
+        find the docker image for my-app
     
-The dot "." at the end of the command denotes location of the Dockerfile.
+    docker rm <container-id>
+    docker rmi <image-id>
+        cannot be executed before the container was removed
+
+    docker run <image-name>:<image-tag>
+        run the built image without any options
+    docker ps
+        check for the container id so that we can connect on it
+    docker exec -it <container-id> /bin/bash
+        connecting to the container and calling the bash, if it doesn't exist try /bin/sh

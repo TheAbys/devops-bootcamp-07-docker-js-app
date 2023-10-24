@@ -11,7 +11,7 @@ services:
     image: mongo-express
     ports:
       - 8081:8081
-    restart: always
+    restart: always #retries connecting to the mongodb service as it must be up first and listen for connections
     environment:
       - ME_CONFIG_MONGODB_ADMINUSERNAME=admin
       - ME_CONFIG_MONGODB_ADMINPASSWORD=password

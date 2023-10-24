@@ -108,7 +108,19 @@ Step 2: Learning about the features of docker
 
 Step 1: start mongodb and mongo-express
 
-    docker-compose -f docker-compose.yaml up
+    # check if any containers are still running
+    docker ps
+    docker stop <container-id> or <container-name> to stop all containers
+
+    cd app
+    docker-compose -f mongo.yaml up
+        starts two containers for mongodb and mongoexpress but also initializes a new network
+        naming convention depending on the parent folder (in this case app, therefore app_default network)
+
+    # error: docker-compose was not installed
+    # solution:
+    sudo apt update
+    sudo apt install docker-compose
     
 _You can access the mongo-express under localhost:8080 from your browser_
     
@@ -125,6 +137,14 @@ Step 4: start node server
 Step 5: access the nodejs application from browser 
 
     http://localhost:3000
+
+Step 6: shutdown the application
+
+    Stop the node execution through ctrl+c in the terminal
+
+    docker-compose -f mongo.yaml down
+        Shutdown the docker containers for mongodb and mongo express
+        Even removes the created containers and the default network which was created through "up"
 
 #### To build a docker image from the application
 

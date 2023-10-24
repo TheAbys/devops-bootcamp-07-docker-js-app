@@ -183,3 +183,6 @@ Step 6: shutdown the application
     docker-compose -f mongo.yaml up
         starting the application including mongodb, mongo-express and my-app
         still have to manually create a database and collection in mongo-express
+
+        added named volume mongo-data which results in a directory /var/lib/docker/volume/<volumnname>
+        the volume can now be used within other containers through adding them with this name like mongo-data:/data/db in mongodb container

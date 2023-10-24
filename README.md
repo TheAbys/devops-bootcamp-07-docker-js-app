@@ -168,3 +168,18 @@ Step 6: shutdown the application
         check for the container id so that we can connect on it
     docker exec -it <container-id> /bin/bash
         connecting to the container and calling the bash, if it doesn't exist try /bin/sh
+
+#### push docker image to private repository
+
+    docker tag <image-name>:<image-tag> <docker-repository>/<image-name>:<image-tag>
+        basically renames the image
+
+    docker push <docker-repository>/<image-name>:<image-tag>
+        pushes the image layer by layer to the repository
+
+    docker build -t my-app:1.0 .
+        rebuilding changes we made to server.js
+
+    docker-compose -f mongo.yaml up
+        starting the application including mongodb, mongo-express and my-app
+        still have to manually create a database and collection in mongo-express

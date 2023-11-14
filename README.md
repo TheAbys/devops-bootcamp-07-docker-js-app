@@ -171,11 +171,76 @@ Step 6: shutdown the application
 
 #### push docker image to private repository
 
-    docker tag <image-name>:<image-tag> <docker-repository>/<image-name>:<image-tag>
-        basically renames the image
+    # within our nexus installation we create a new repository "docker-hosted" http://207.154.243.149:8081/repository/docker-hosted/
+    # additionally we create a new Role under Security which is able to handle this new repository
+    # we assign the Role to our previously created User
 
-    docker push <docker-repository>/<image-name>:<image-tag>
-        pushes the image layer by layer to the repository
+    # for docker repository we have to add another free port in the http field of the repository were docker can directly connect to
+
+    # to check wether the port was opened we can switch to our nexus servers shell
+    #root@ubuntu-s-4vcpu-8gb-fra1-01:~# netstat -lnpt
+    #Active Internet connections (only servers)
+    #Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+    #tcp        0      0 127.0.0.1:44601         0.0.0.0:*               LISTEN      3362/java           
+    #tcp        0      0 0.0.0.0:8083            0.0.0.0:*               LISTEN      3362/java           
+    #tcp        0      0 0.0.0.0:8081            0.0.0.0:*               LISTEN      3362/java           
+    #tcp        0      0 127.0.0.53:53           0.0.0.0:*               LISTEN      340026/systemd-reso 
+    #tcp        0      0 127.0.0.54:53           0.0.0.0:*               LISTEN      340026/systemd-reso 
+    #tcp6       0      0 :::22                   :::*                    LISTEN      1/systemd  
+
+    # we still need to allow the port 8083 on our firewall configuration of digitalocean droplet
+    # under our droplet => networking => Firewalls "my-droplet-firewall" we can achiev that
+
+    # last thing to configure is a realm under Security => Realms => Docker Bearer Token Realm
+    cat ~/.docker/config.json
+    # if the file doesn't exist this means we've never logged in to a docker repository (docker hub, ...)
+    # after the first login the file should exist
+
+    # our nexus configuration is currently only running in http
+    # therefore we must allow docker to connect to http as normaly https is forced
+
+    # on windows/mac this file is not easily accessable because of docker desktop is fully virtualized
+    # on linux we add or edit daemon.json
+    vim /etc/docker/daemon.json
+    #{
+    #   "insecure-registries" : [ "207.154.243.149:8083" ]
+    #}
+
+    # reload docker
+    systemctl reload docker
+
+    # login (with username + password), will be stored unencrypted
+    docker login 207.154.243.149:8083
+
+    # go to the directory with Dockerfile in it
+    docker build -t my-app:1.0 .
+
+    # basically renames the image
+    docker tag my-app:1.0 207.154.243.149:8083:/my-app:1.0
+
+    # pushes the image layer by layer to the repository
+    # if the version of the image is omitted latest is default, the push doesn't work if there is no latest
+    docker push 207.154.243.149:8083/my-app:1.0
+
+    # obvious learning about ssh
+    # the ssh private key does only match to the ssh public key if i'm logged in as the correct user
+    # if my public key is based on "basti" but i'm logged in as root access is obviously denied
+
+    # we want to setup nexus as a docker container
+    # also we want the data to be persistant and not get lost so we create a volume
+    docker volume create --name nexus-data
+    docker volume ls
+
+    # run a container with the nexus3 image, expose port 8081 and use the created volume
+    docker run -d -p 8081:8081 --name nexus -v nexus-data:/nexus-data sonatype/nexus3
+
+    # check the created volume on the host
+    # lists information like the path to the volume on the host
+    # can also be used for containers
+    docker inspect nexus-data
+    cd /var/snap/docker/common/var-lib-docker/volumes/nexus-data/_data
+    # the data can also be accessed from within the container after connecting to it through docker exec
+    
 
     docker build -t my-app:1.0 .
         rebuilding changes we made to server.js

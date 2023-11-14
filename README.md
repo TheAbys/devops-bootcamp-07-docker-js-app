@@ -241,7 +241,6 @@ Step 6: shutdown the application
     cd /var/snap/docker/common/var-lib-docker/volumes/nexus-data/_data
     # the data can also be accessed from within the container after connecting to it through docker exec
     
-
     docker build -t my-app:1.0 .
         rebuilding changes we made to server.js
 
@@ -251,3 +250,15 @@ Step 6: shutdown the application
 
         added named volume mongo-data which results in a directory /var/lib/docker/volume/<volumnname>
         the volume can now be used within other containers through adding them with this name like mongo-data:/data/db in mongodb container
+
+
+    # docker best practises
+    1. always use official images for example for node, do not install linux + node yourself
+    2. always use a specific version tag, do not use latest as it is unpredictable
+    3. if full blown os like ubuntu is not required as all the extra tools are not relevant for the current case, just use a leaner linux distribution for example alpine
+    4. the order of steps within the dockerfile matter, for a node application we do not want to execute npm install when not necessary, this can be achieved with the correct order
+        # check the history of an image, all image layers basically, docker history my-app:1.0
+    5. you can use .dockerignore to specifically exclude some files from the docker build
+    6. multi-stage-build use temporary images and only keep the final image
+    7. always use a least privileged user, never use root, you can just add a group and user, give the correct permissions and change the user within the container to the created one
+    8. scan vulnerabilities of the image through "docker scan cves", this gives hints on actions you have to do and stores the information for all other users to docker hub
